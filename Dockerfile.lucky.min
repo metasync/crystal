@@ -1,0 +1,35 @@
+FROM alpine:3.17
+
+ARG crystal_release
+ARG crystal_build
+ARG lucky_cli_version
+
+ENV crystal_release=${crystal_release:-1.6.2}
+ENV crystal_build=${crystal_build:-r0}
+ENV crystal_version=${crystal_release}-${crystal_build}
+ENV lucky_cli_version ${lucky_cli_version:-1.0.0-rc1}
+
+RUN apk -U upgrade && \
+    apk add --no-cache crystal=${crystal_version} shards \
+      curl bash git-flow tree \
+      gmp-dev libpng-dev libpq-dev \
+      libc-dev libevent-dev pcre2-dev \
+      yaml-dev zlib-dev openssl-dev libxml2-dev \
+      postgresql-client \
+      tzdata && \
+    \
+    git clone https://github.com/luckyframework/lucky_cli && \
+    cd lucky_cli && \
+    git checkout v${lucky_cli_version} && \
+    shards install --without-development && \
+    shards build --production && \
+    cp bin/lucky /usr/local/bin && \
+    cd .. && rm -fr lucky_cli && \
+    \
+    mkdir /app && \
+    chown -R 1001:0 /app && \
+    chmod -R g=u /app
+
+USER 1001
+
+WORKDIR /app

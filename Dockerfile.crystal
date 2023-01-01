@@ -1,0 +1,19 @@
+FROM alpine:3.17
+
+ARG crystal_release
+ARG crystal_build
+
+ENV crystal_release=${crystal_release:-1.6.2}
+ENV crystal_build=${crystal_build:-r0}
+ENV crystal_version=${crystal_release}-${crystal_build}
+
+RUN apk -U upgrade && \
+    apk add --no-cache crystal=${crystal_version} shards && \
+    \
+    mkdir /app && \
+    chown -R 1001:0 /app && \
+    chmod -R g=u /app
+    
+USER 1001
+
+WORKDIR /app
