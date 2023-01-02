@@ -22,3 +22,5 @@ init.lib:
 prune:
 	@docker image prune -f
 clean: prune
+
+.PHONY: dev build.crystal build.lucky run.crystal run.lucky init.app init.lib prune clean
